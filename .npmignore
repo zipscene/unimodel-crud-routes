@@ -1,0 +1,16 @@
+# general
+bower_components
+node_modules
+tmp
+
+# logs
+npm-debug.log
+
+# debug
+/test*.js
+
+# platform
+*.sublime-project
+*.sublime-workspace
+*.swp
+.DS_Store
