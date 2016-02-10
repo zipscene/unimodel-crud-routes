@@ -11,15 +11,22 @@
     "lint": "node ./node_modules/.bin/eslint . || exit 0",
     "docs": "node ./node_modules/.bin/yuidoc .",
     "test": "npm run-script build && node ./node_modules/.bin/mocha ./dist/test -R spec",
-    "build": "rm -rf dist && ./node_modules/.bin/broccoli build dist && chmod u+x dist/bin/* && rm -rf tmp",
+    "build": "rm -rf dist && ./node_modules/.bin/broccoli build dist && rm -rf tmp",
     "prepublish": "npm run-script build && npm run-script docs"
   },
   "dependencies": {
     "babel-runtime": "6.3.19",
+    "crisphooks": "^2.0.0",
+    "decamelize": "^1.1.2",
     "lodash": "^4.2.1",
     "pasync": "^1.4.0",
     "xerror": "^1.1.1",
-    "zs-objtools": "^1.4.0"
+    "zs-common-query": "^1.8.0",
+    "zs-common-schema": "^1.7.3",
+    "zs-model-schema-types": "^0.2.3",
+    "zs-objtools": "^1.4.0",
+    "zs-permission": "^1.0.0",
+    "zs-unimodel": "^0.5.25"
   },
   "devDependencies": {
     "broccoli": "^0.16.9",
@@ -33,7 +40,8 @@
     "eslint": "^1.10.3",
     "mocha": "^2.4.5",
     "source-map-support": "^0.4.0",
-    "yuidocjs": "^0.10.0"
+    "yuidocjs": "^0.10.0",
+    "zs-unimodel-fake": "^0.2.0"
   },
   "publishConfig": {
     "registry": "https://npm.zipscene.com/"

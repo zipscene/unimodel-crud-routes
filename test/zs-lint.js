@@ -1,7 +1,7 @@
 const path = require('path');
 const { spawn } = require('child_process');
 
-describe('Linter', function() {
+describe.skip('Linter', function() {
 	it('should not have any linter problems', function(done) {
 		this.timeout(60000);
 
