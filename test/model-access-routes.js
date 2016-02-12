@@ -91,7 +91,7 @@ describe('Routes', function() {
 
 		it('basic functionality', function() {
 			const { app } = buildTestApp();
-			return jsonrpc(app, 'animal.get', { id: 'foo' })
+			return jsonrpc(app, 'animal.get', { keys: { id: 'foo' } })
 				.then((result) => {
 					expect(result.result.id).to.equal('foo');
 					expect(result.result.name).to.equal('Toby');
@@ -101,7 +101,7 @@ describe('Routes', function() {
 		it('with fields', function() {
 			const { app } = buildTestApp();
 			return jsonrpc(app, 'animal.get', {
-				id: 'foo',
+				keys: { id: 'foo' },
 				fields: [ 'animalType', 'name' ]
 			})
 				.then((result) => {
@@ -114,7 +114,7 @@ describe('Routes', function() {
 		it('permission denied', function() {
 			const { app } = buildTestApp({ permissions: permissionSets.noRead });
 			return jsonrpc(app, 'animal.get', {
-				id: 'foo'
+				keys: { id: 'foo' }
 			})
 				.then(() => {
 					throw new Error('Expected error');
@@ -299,7 +299,7 @@ describe('Routes', function() {
 				}
 			})
 				.then((result) => {
-					expect(result).to.deep.equal({ success: true });
+					expect(result).to.deep.equal({ success: true, keys: { id: 'asdf' } });
 				})
 				.then(() => {
 					return Animal.findOne({ id: 'asdf' });

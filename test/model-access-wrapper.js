@@ -321,6 +321,9 @@ describe('Wrapper', function() {
 				},
 				permissions: permissionSets.everything
 			})
+				.then((result) => {
+					expect(result.keys.id).to.equal('asdf');
+				})
 				.then(() => Animal.find({ id: 'asdf' }))
 				.then((results) => {
 					expect(results.length).to.equal(1);
