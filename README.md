@@ -9,7 +9,7 @@ yuidoc comments.
 ## Registering Routes
 
 ```js
-const { ModelAccessWrapper, ModelAccessRoutes } = require('../lib');
+const { ModelAccessWrapper, ModelAccessRoutes } = require('zs-unimodel-crud-routes');
 const { APIRouter } = require('zs-api-router');
 const express = require('express');
 
