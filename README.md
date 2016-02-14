@@ -60,8 +60,8 @@ The following routes are registered:
 
 The `get` route (ie, `item-prices.get`) fetches a single item.  It takes the following parameters:
 
-- Whichever fields are marked as key fields: Supply as parameters any key fields required to get
-  the object.
+- `keys`: An object containing each of the key fields of the object to get.  Ie, if the object
+  has a key called `id`, this could be: `{ keys: { id: 'foo' } }`
 - `fields`: An array of field paths to return.  Defaults to every field.
 
 It returns a result like this:
