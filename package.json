@@ -26,6 +26,7 @@
     "zs-model-schema-types": "^0.2.3",
     "zs-objtools": "^1.4.0",
     "zs-permission": "^1.0.2",
+    "zs-simple-profiler": "^1.2.4",
     "zs-unimodel": "^0.6.0",
     "zstreams": "^3.2.2"
   },
