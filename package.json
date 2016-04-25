@@ -1,6 +1,6 @@
 {
   "name": "zs-unimodel-crud-routes",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "CRUD route code for interfacing with zs-unimodel",
   "main": "./dist/lib/index.js",
   "repository": {
@@ -21,13 +21,13 @@
     "lodash": "^4.2.1",
     "pasync": "^1.4.0",
     "xerror": "^1.1.1",
-    "zs-common-query": "^1.9.2",
-    "zs-common-schema": "^1.7.3",
-    "zs-model-schema-types": "^0.2.3",
+    "zs-common-query": "^1.9.4",
+    "zs-common-schema": "^1.7.7",
+    "zs-model-schema-types": "^0.2.5",
     "zs-objtools": "^1.4.0",
     "zs-permission": "^1.0.2",
-    "zs-simple-profiler": "^1.2.4",
-    "zs-unimodel": "^0.6.0",
+    "zs-simple-profiler": "^1.2.5",
+    "zs-unimodel": "^0.6.4",
     "zstreams": "^3.2.2"
   },
   "devDependencies": {
