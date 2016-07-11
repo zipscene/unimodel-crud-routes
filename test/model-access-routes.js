@@ -316,7 +316,7 @@ describe('Routes', function() {
 		it('basic functionality', function() {
 			const { app } = buildTestApp();
 			return jsonrpc(app, 'animal.put-multi', {
-				datas: [ {
+				data: [ {
 					id: 'test1',
 					animalType: 'cat',
 					name: 'Toby',
