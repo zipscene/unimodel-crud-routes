@@ -21,6 +21,7 @@
     "lodash": "^4.2.1",
     "pasync": "^1.4.0",
     "xerror": "^1.1.1",
+    "zs-api-router": "^1.4.6",
     "zs-common-query": "^1.9.4",
     "zs-common-schema": "^1.7.7",
     "zs-model-schema-types": "^0.2.5",
