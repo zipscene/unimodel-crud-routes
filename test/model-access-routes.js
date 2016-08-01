@@ -50,7 +50,7 @@ function jsonrpc(app, method, params = {}) {
 				} else if (!response.body) {
 					reject(new XError(XError.INTERNAL_ERROR, 'No response body'));
 				} else if (response.body.error) {
-					reject(XError.fromObject(response.body.error));
+					reject(response.body.error);
 				} else {
 					resolve(response.body.result);
 				}
@@ -311,6 +311,57 @@ describe('Routes', function() {
 
 	});
 
+	describe('putMulti', function() {
+
+		it('basic functionality', function() {
+			const { app } = buildTestApp();
+			return jsonrpc(app, 'animal.put-multi', {
+				data: [ {
+					id: 'test1',
+					animalType: 'cat',
+					name: 'Toby',
+					age: 5
+				},
+				{
+					id: 'test2',
+					animalType: 'dog',
+					name: 'Ruff',
+					age: 2
+				},
+				{
+					id: 'test3',
+					animalType: 'cat',
+					name: 'Luna',
+					age: 8
+				} ]
+			})
+				.then((result) => {
+					expect(result).to.deep
+						.equal({ success: true, keys: [ { id: 'test1' }, { id: 'test2' }, { id: 'test3' } ] });
+				})
+				.then(() => {
+					return Animal.findOne({ id: 'test1' });
+				})
+				.then((result) => {
+					expect(result.data.name).to.equal('Toby');
+				})
+				.then(() => {
+					return Animal.findOne({ id: 'test2' });
+				})
+				.then((result) => {
+					expect(result.data.name).to.equal('Ruff');
+				})
+				.then(() => {
+					return Animal.findOne({ id: 'test3' });
+				})
+				.then((result) => {
+					expect(result.data.name).to.equal('Luna');
+				});
+
+		});
+
+	});
+
 
 	describe('update', function() {
 
@@ -393,4 +444,3 @@ describe('Routes', function() {
 	});
 
 });
-
