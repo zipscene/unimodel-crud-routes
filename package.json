@@ -1,6 +1,6 @@
 {
   "name": "zs-unimodel-crud-routes",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "CRUD route code for interfacing with zs-unimodel",
   "main": "./dist/lib/index.js",
   "repository": {
