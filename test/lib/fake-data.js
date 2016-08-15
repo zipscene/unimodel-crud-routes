@@ -12,7 +12,11 @@ const Animal = new FakeModel('Animal', {
 		enum: [ 'cat', 'dog', 'horse', 'frog' ]
 	},
 	name: String,
-	age: Number
+	age: Number,
+	ssn: {
+		type: String,
+		private: true
+	}
 });
 
 const testAnimals = [
@@ -44,13 +48,15 @@ const testAnimals = [
 		id: 'biz',
 		animalType: 'horse',
 		name: 'Lightning',
-		age: 3
+		age: 3,
+		ssn: '123-123-1234'
 	},
 	{
 		id: 'boop',
 		animalType: 'frog',
 		name: 'Zippy',
-		age: 1
+		age: 1,
+		ssn: '123-123-1235'
 	}
 ];
 
