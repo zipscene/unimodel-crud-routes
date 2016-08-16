@@ -46,7 +46,6 @@
     "source-map-support": "^0.4.0",
     "supertest": "^1.1.0",
     "yuidocjs": "^0.10.0",
-    "zs-api-router": "^1.3.0",
     "zs-unimodel-fake": "^0.2.1"
   },
   "publishConfig": {

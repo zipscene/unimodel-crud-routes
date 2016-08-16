@@ -9,7 +9,7 @@ describe('Wrapper', function() {
 
 	beforeEach(function() {
 		Animal.clear();
-		return Animal.insertMulti(testAnimals);
+		return Animal.insertMulti(testAnimals, { allowPrivateFields: true });
 	});
 
 	describe('get()', function() {
@@ -64,6 +64,27 @@ describe('Wrapper', function() {
 						animalType: 'horse'
 					});
 				});
+		});
+
+		it('allowPrivateFields', function() {
+			let wrapper = new ModelAccessWrapper({
+				model: Animal
+			});
+			return wrapper.get({
+				keys: { id: 'biz' },
+				permissions: permissionSets.everything,
+				allowPrivateFields: true
+			}).then((result) => {
+				expect(result.doc.data.id).to.equal('biz');
+				delete result.data._id;
+				expect(result.data).to.deep.equal({
+					id: 'biz',
+					animalType: 'horse',
+					name: 'Lightning',
+					age: 3,
+					ssn: '123-123-1234'
+				});
+			});
 		});
 
 		it('pre-get hook', function() {
@@ -179,6 +200,33 @@ describe('Wrapper', function() {
 				}, (err) => {
 					expect(err.code).to.equal(XError.ACCESS_DENIED);
 				});
+		});
+
+		it('query on private field', function() {
+			let wrapper = new ModelAccessWrapper({
+				model: Animal
+			});
+			return wrapper.query({
+				query: { ssn: '123-123-1234' },
+				permissions: permissionSets.everything
+			}).then(() => {
+				throw new Error('Expected error');
+			}, (err) => {
+				expect(err.code).to.equal(XError.ACCESS_DENIED);
+			});
+		});
+
+		it('query on private field with allowPrivateFields', () => {
+			let wrapper = new ModelAccessWrapper({
+				model: Animal
+			});
+			return wrapper.query({
+				query: { ssn: '123-123-1234' },
+				permissions: permissionSets.everything,
+				allowPrivateFields: true
+			}).then((result) => {
+				expect(result[0].data.id).to.equal('biz');
+			});
 		});
 
 	});
@@ -376,6 +424,25 @@ describe('Wrapper', function() {
 				}, (err) => {
 					expect(err.code).to.equal(XError.ACCESS_DENIED);
 				});
+		});
+
+		it('put to private field failure', function() {
+			let wrapper = new ModelAccessWrapper({
+				model: Animal
+			});
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5,
+					ssn: '456-456-4567'
+				},
+				permissions: permissionSets.everything
+			}).then(() => {
+				throw new Error('Expected error');
+			}, (err) => {
+				expect(err.code).to.equal(XError.ACCESS_DENIED);
+			});
 		});
 
 	});
@@ -655,6 +722,19 @@ describe('Wrapper', function() {
 				}, (err) => {
 					expect(err.code).to.equal(XError.ACCESS_DENIED);
 				});
+		});
+
+	});
+
+	describe('#publicSchema', function() {
+
+		it('exists and does not include private fields', function() {
+			let wrapper = new ModelAccessWrapper({
+				model: Animal
+			});
+			expect(wrapper.publicSchema).to.exist;
+			expect(wrapper.publicSchema.getData().properties.id).to.exist;
+			expect(wrapper.publicSchema.getData().properties.ssn).to.not.exist;
 		});
 
 	});
