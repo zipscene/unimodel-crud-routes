@@ -1,6 +1,6 @@
 {
-	"name": "zs-unimodel-crud-routes",
-	"description": "CRUD route code for interfacing with zs-unimodel",
+	"name": "unimodel-crud-routes",
+	"description": "CRUD route code for interfacing with unimodel-core",
 	"options": {
 		"outdir": "./docs",
 		"exclude": "dist,tmp,test,node_modules"

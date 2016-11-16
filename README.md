@@ -1,6 +1,6 @@
 # Unimodel CRUD Access Routes
 
-This library registers routes with a zs-api-router application for CRUD on unimodel models.
+This library registers routes with a yaar application for CRUD on unimodel models.
 These routes provide permissions evaluation, input validation, result formatting, etc.
 This library also provides a wrapper on top of unimodel models that allow for permissions evaluation
 in a user context without calling a route.  This wrapper is not documented here; instead, check the
@@ -9,8 +9,8 @@ yuidoc comments.
 ## Registering Routes
 
 ```js
-const { ModelAccessWrapper, ModelAccessRoutes } = require('zs-unimodel-crud-routes');
-const { APIRouter } = require('zs-api-router');
+const { ModelAccessWrapper, ModelAccessRoutes } = require('unimodel-crud-routes');
+const { APIRouter } = require('yaar');
 const express = require('express');
 
 const router = new APIRouter();
@@ -44,7 +44,7 @@ The `ModelAccessRoutes` takes the following options:
 - `routePrefix`: The prefix to use for routes.  By default, this is the lowercased-and-hyphenated
   version of `model.getName()` .  So, if your model name is `ItemPrices`, the route prefix will
   default to "item-prices." .
-- `extraMiddleware`: This is an array of middleware functions for zs-api-router.  These middleware
+- `extraMiddleware`: This is an array of middleware functions for yaar.  These middleware
   functions are run after parameter validation, but before any processing.  There is expected to be
   at least one middleware here that sets `ctx.auth.permissions` for permissions evaluation.
 - `extraParams`: This is an array of extra parameters that the API calls accept and are passed through

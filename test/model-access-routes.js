@@ -1,12 +1,16 @@
+// Copyright 2016 Zipscene, LLC
+// Licensed under the Apache License, Version 2.0
+// http://www.apache.org/licenses/LICENSE-2.0
+
 const { expect } = require('chai');
 const { ModelAccessWrapper, ModelAccessRoutes } = require('../lib');
 const XError = require('xerror');
 const _ = require('lodash');
 const { Animal, testAnimals, permissionSets } = require('./lib/fake-data');
-const { APIRouter, JSONRPCInterface } = require('zs-api-router');
+const { APIRouter, JSONRPCInterface } = require('yaar');
 const express = require('express');
 const supertest = require('supertest');
-const { deepCopy } = require('zs-objtools');
+const { deepCopy } = require('objtools');
 
 function buildTestApp(options = {}, callSpecificOptions = {}) {
 	const router = new APIRouter();
