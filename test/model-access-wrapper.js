@@ -389,6 +389,44 @@ describe('Wrapper', function() {
 				});
 		});
 
+		it('replace existing', function() {
+			let wrapper = new ModelAccessWrapper({
+				model: Animal
+			});
+			return wrapper.put({
+				data: {
+					id: 'foo',
+					animalType: 'dog',
+					name: 'bar',
+					age: 98
+				},
+				permissions: permissionSets.everything
+			})
+				.then(() => wrapper.put({
+					data: {
+						id: 'asdf',
+						animalType: 'frog',
+						name: 'ASDF',
+						age: 99
+					},
+					permissions: permissionSets.everything
+				}))
+				.then((result) => {
+					expect(result.keys.id).to.equal('asdf');
+				})
+				.then(() => Animal.find({ id: 'asdf' }))
+				.then((results) => {
+					expect(results.length).to.equal(1);
+					delete results[0].data._id;
+					expect(results[0].data).to.deep.equal({
+						id: 'asdf',
+						animalType: 'frog',
+						name: 'ASDF',
+						age: 99
+					});
+				});
+		});
+
 		it('partial write permissions success', function() {
 			let wrapper = new ModelAccessWrapper({
 				model: Animal
