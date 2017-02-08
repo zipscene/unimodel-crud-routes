@@ -487,6 +487,44 @@ describe('Wrapper', function() {
 			});
 		});
 
+		it('preserve private fields', function() {
+			let wrapper = new ModelAccessWrapper({
+				model: Animal
+			});
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5,
+					ssn: '456-456-4567'
+				},
+				permissions: permissionSets.everything,
+				allowPrivateFields: true
+			})
+			.then(() => {
+				return wrapper.put({
+					data: {
+						id: 'asdf',
+						animalType: 'frog',
+						age: 6
+					},
+					permissions: permissionSets.everything
+				});
+			})
+			.then(() => {
+				return Animal.find({ id: 'asdf' });
+			})
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					animalType: 'frog',
+					age: 6,
+					ssn: '456-456-4567'
+				});
+			});
+		});
+
 	});
 
 
