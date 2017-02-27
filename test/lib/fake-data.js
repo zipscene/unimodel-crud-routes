@@ -13,7 +13,8 @@ const Animal = new FakeModel('Animal', {
 	},
 	animalType: {
 		type: String,
-		enum: [ 'cat', 'dog', 'horse', 'frog' ]
+		enum: [ 'cat', 'dog', 'horse', 'frog' ],
+		default: 'dog'
 	},
 	name: String,
 	age: Number,

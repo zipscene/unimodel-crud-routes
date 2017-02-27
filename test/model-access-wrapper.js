@@ -559,6 +559,7 @@ describe('Wrapper', function() {
 					delete doc.data._id;
 					expect(doc.data).to.deep.equal({
 						id: 'test',
+						animalType: 'dog',
 						name: 'Zag',
 						age: 10
 					});
