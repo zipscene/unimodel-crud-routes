@@ -32,7 +32,8 @@ describe('Wrapper', function() {
 						id: 'biz',
 						animalType: 'horse',
 						name: 'Lightning',
-						age: 3
+						age: 3,
+						coolness: 4
 					});
 				});
 		});
@@ -86,7 +87,8 @@ describe('Wrapper', function() {
 					animalType: 'horse',
 					name: 'Lightning',
 					age: 3,
-					ssn: '123-123-1234'
+					ssn: '123-123-1234',
+					coolness: 4
 				});
 			});
 		});
@@ -384,7 +386,8 @@ describe('Wrapper', function() {
 						id: 'asdf',
 						animalType: 'frog',
 						name: 'ASDF',
-						age: 99
+						age: 99,
+						coolness: 4
 					});
 				});
 		});
@@ -422,7 +425,8 @@ describe('Wrapper', function() {
 						id: 'asdf',
 						animalType: 'frog',
 						name: 'ASDF',
-						age: 99
+						age: 99,
+						coolness: 4
 					});
 				});
 		});
@@ -444,7 +448,8 @@ describe('Wrapper', function() {
 					delete results[0].data._id;
 					expect(results[0].data).to.deep.equal({
 						id: 'asdf',
-						animalType: 'frog'
+						animalType: 'frog',
+						coolness: 4
 					});
 				});
 		});
@@ -561,7 +566,8 @@ describe('Wrapper', function() {
 						id: 'test',
 						animalType: 'dog',
 						name: 'Zag',
-						age: 10
+						age: 10,
+						coolness: 4
 					});
 				});
 		});

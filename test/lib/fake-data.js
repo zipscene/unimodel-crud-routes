@@ -21,6 +21,15 @@ const Animal = new FakeModel('Animal', {
 	ssn: {
 		type: String,
 		private: true
+	},
+	coolness: {
+		type: Number,
+		protected: true,
+		default: 4
+	},
+	favNumber: {
+		type: Number,
+		protected: true
 	}
 });
 
