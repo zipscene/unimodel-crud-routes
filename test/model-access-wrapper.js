@@ -516,20 +516,77 @@ describe('Wrapper', function() {
 					permissions: permissionSets.everything
 				});
 			})
-			.then(() => {
-				return Animal.find({ id: 'asdf' });
-			})
+			.then(() => Animal.find({ id: 'asdf' }))
 			.then((results) => {
 				expect(results.length).to.equal(1);
 				expect(results[0].data).to.deep.equal({
 					id: 'asdf',
 					animalType: 'frog',
 					age: 6,
-					ssn: '456-456-4567'
+					ssn: '456-456-4567',
+					coolness: 4
 				});
 			});
 		});
 
+		it('ignore protected fields for new documents', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5,
+					coolness: 3,
+					favNumber: 6
+				},
+				permissions: permissionSets.everything
+			})
+			.then(() => Animal.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				delete results[0].data._id;
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5,
+					coolness: 4
+				});
+			});
+		});
+
+		it('ignore protected fields on update', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5
+				},
+				permissions: permissionSets.everything
+			})
+			.then(() => {
+				return wrapper.put({
+					data: {
+						id: 'asdf',
+						animalType: 'frog',
+						age: 6,
+						coolness: 3,
+						favNumber: 2
+					},
+					permissions: permissionSets.everything
+				});
+			})
+			.then(() => Animal.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					animalType: 'frog',
+					age: 6,
+					coolness: 4
+				});
+			});
+		});
 	});
 
 
