@@ -128,6 +128,18 @@ const permissionSets = {
 			}
 		}
 	]),
+	almostEverything: new PermissionSet([ {
+		target: 'Animal',
+		match: {},
+		grant: {
+			read: true,
+			query: true,
+			aggregate: true,
+			write: true,
+			readMask: true,
+			writeMask: true
+		}
+	} ]),
 	everything: new PermissionSet([ {
 		target: 'Animal',
 		match: {},

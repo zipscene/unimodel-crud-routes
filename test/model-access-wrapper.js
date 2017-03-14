@@ -539,7 +539,7 @@ describe('Wrapper', function() {
 					coolness: 3,
 					favNumber: 6
 				},
-				permissions: permissionSets.everything
+				permissions: permissionSets.almostEverything
 			})
 			.then(() => Animal.find({ id: 'asdf' }))
 			.then((results) => {
@@ -554,7 +554,68 @@ describe('Wrapper', function() {
 			});
 		});
 
-		it('ignore protected fields on update', function() {
+		it('ignore protected fields for updates', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5
+				},
+				permissions: permissionSets.almostEverything
+			})
+			.then(() => {
+				return wrapper.put({
+					data: {
+						id: 'asdf',
+						animalType: 'frog',
+						age: 6,
+						coolness: 3,
+						favNumber: 2
+					},
+					permissions: permissionSets.almostEverything
+				});
+			})
+			.then(() => Animal.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					animalType: 'frog',
+					age: 6,
+					coolness: 4
+				});
+			});
+		});
+
+		it('respect overwriteProtected for new documents', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5,
+					coolness: 3,
+					favNumber: 6
+				},
+				permissions: permissionSets.everything,
+				overwriteProtected: true
+			})
+			.then(() => Animal.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				delete results[0].data._id;
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5,
+					coolness: 3,
+					favNumber: 6
+				});
+			});
+		});
+
+		it('respect overwriteProtected for updates', function() {
 			let wrapper = new ModelAccessWrapper({ model: Animal });
 			return wrapper.put({
 				data: {
@@ -573,7 +634,8 @@ describe('Wrapper', function() {
 						coolness: 3,
 						favNumber: 2
 					},
-					permissions: permissionSets.everything
+					permissions: permissionSets.everything,
+					overwriteProtected: true
 				});
 			})
 			.then(() => Animal.find({ id: 'asdf' }))
@@ -583,10 +645,32 @@ describe('Wrapper', function() {
 					id: 'asdf',
 					animalType: 'frog',
 					age: 6,
-					coolness: 4
+					coolness: 3,
+					favNumber: 2
 				});
 			});
 		});
+
+		it('error if no permission to overwriteProtected', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5,
+					coolness: 3,
+					favNumber: 6
+				},
+				permissions: permissionSets.almostEverything,
+				overwriteProtected: true
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+				});
+		});
+
 	});
 
 
