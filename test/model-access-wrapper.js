@@ -813,9 +813,7 @@ describe('Wrapper', function() {
 	describe('update()', function() {
 
 		it('basic functionality', function() {
-			let wrapper = new ModelAccessWrapper({
-				model: Animal
-			});
+			let wrapper = new ModelAccessWrapper({ model: Animal });
 			return wrapper.update({
 				query: { name: 'Felix' },
 				update: { $set: { age: 10 } },
@@ -828,9 +826,7 @@ describe('Wrapper', function() {
 		});
 
 		it('partial write permissions success', function() {
-			let wrapper = new ModelAccessWrapper({
-				model: Animal
-			});
+			let wrapper = new ModelAccessWrapper({ model: Animal });
 			return wrapper.update({
 				query: { id: 'baz' },
 				update: { $set: { animalType: 'dog' } },
@@ -843,13 +839,69 @@ describe('Wrapper', function() {
 		});
 
 		it('partial write permissions failure', function() {
-			let wrapper = new ModelAccessWrapper({
-				model: Animal
-			});
+			let wrapper = new ModelAccessWrapper({ model: Animal });
 			return wrapper.update({
 				query: { id: 'baz' },
 				update: { $set: { age: 1 } },
 				permissions: permissionSets.partialWrite
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+				});
+		});
+
+		it('error when update contains protected fields', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.update({
+				query: { id: 'baz' },
+				update: { $set: { animalType: 'dog', favNumber: 2 } },
+				permissions: permissionSets.partialWriteOverProtected
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.INVALID_ARGUMENT);
+				});
+		});
+
+		it('partial protected write permissions success', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.update({
+				query: { id: 'baz' },
+				update: { $set: { favNumber: 2 } },
+				permissions: permissionSets.partialWriteOverProtected,
+				overwriteProtected: true
+			})
+				.then(() => Animal.findOne({ id: 'baz' }))
+				.then((doc) => {
+					expect(doc.data.favNumber).to.equal(2);
+				});
+		});
+
+		it('partial protected write permissions failure', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.update({
+				query: { id: 'baz' },
+				update: { $set: { coolness: 2 } },
+				permissions: permissionSets.partialWriteOverProtected,
+				overwriteProtected: true
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+				});
+		});
+
+		it('error if no permission to overwriteProtected', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.update({
+				query: { id: 'baz' },
+				update: { $set: { animalType: 'dog', favNumber: 2 } },
+				permissions: permissionSets.partialWrite,
+				overwriteProtected: true
 			})
 				.then(() => {
 					throw new Error('Expected error');

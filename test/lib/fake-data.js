@@ -107,7 +107,28 @@ const permissionSets = {
 			},
 			writeMask: {
 				id: true,
+				animalType: true,
+				favNumber: true
+			}
+		}
+	} ]),
+	partialWriteOverProtected: new PermissionSet([ {
+		target: 'Animal',
+		match: {},
+		grant: {
+			overwriteProtected: true,
+			read: true,
+			query: true,
+			aggregate: true,
+			write: true,
+			readMask: {
+				id: true,
 				animalType: true
+			},
+			writeMask: {
+				id: true,
+				animalType: true,
+				favNumber: true
 			}
 		}
 	} ]),
