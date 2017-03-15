@@ -537,7 +537,8 @@ describe('Wrapper', function() {
 					animalType: 'frog',
 					age: 5,
 					coolness: 3,
-					favNumber: 6
+					favNumber: 6,
+					favWords: [ 'foo', 'bar' ]
 				},
 				permissions: permissionSets.almostEverything
 			})
@@ -571,7 +572,8 @@ describe('Wrapper', function() {
 						animalType: 'frog',
 						age: 6,
 						coolness: 3,
-						favNumber: 2
+						favNumber: 2,
+						favWords: [ 'foo', 'bar' ]
 					},
 					permissions: permissionSets.almostEverything
 				});
@@ -596,7 +598,8 @@ describe('Wrapper', function() {
 					animalType: 'frog',
 					age: 5,
 					coolness: 3,
-					favNumber: 6
+					favNumber: 6,
+					favWords: [ 'foo', 'bar' ]
 				},
 				permissions: permissionSets.everything,
 				overwriteProtected: true
@@ -610,7 +613,8 @@ describe('Wrapper', function() {
 					animalType: 'frog',
 					age: 5,
 					coolness: 3,
-					favNumber: 6
+					favNumber: 6,
+					favWords: [ 'foo', 'bar' ]
 				});
 			});
 		});
@@ -632,7 +636,8 @@ describe('Wrapper', function() {
 						animalType: 'frog',
 						age: 6,
 						coolness: 3,
-						favNumber: 2
+						favNumber: 2,
+						favWords: [ 'foo', 'bar' ]
 					},
 					permissions: permissionSets.everything,
 					overwriteProtected: true
@@ -646,9 +651,30 @@ describe('Wrapper', function() {
 					animalType: 'frog',
 					age: 6,
 					coolness: 3,
-					favNumber: 2
+					favNumber: 2,
+					favWords: [ 'foo', 'bar' ]
 				});
 			});
+		});
+
+		it('respect overwriteProtected permissions', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					favNumber: 6,
+					favWords: [ 'foo', 'bar' ]
+				},
+				permissions: permissionSets.partialWriteOverProtected,
+				overwriteProtected: true
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+					expect(err.data.grantKey).to.equal('writeMask.coolness');
+				});
 		});
 
 		it('error if no permission to overwriteProtected', function() {
@@ -659,7 +685,8 @@ describe('Wrapper', function() {
 					animalType: 'frog',
 					age: 5,
 					coolness: 3,
-					favNumber: 6
+					favNumber: 6,
+					favWords: [ 'foo', 'bar' ]
 				},
 				permissions: permissionSets.almostEverything,
 				overwriteProtected: true

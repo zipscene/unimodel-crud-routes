@@ -30,7 +30,11 @@ const Animal = new FakeModel('Animal', {
 	favNumber: {
 		type: Number,
 		protected: true
-	}
+	},
+	favWords: [ {
+		type: String,
+		protected: true
+	} ]
 });
 
 const testAnimals = [
