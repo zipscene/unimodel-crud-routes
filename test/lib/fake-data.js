@@ -37,6 +37,18 @@ const Animal = new FakeModel('Animal', {
 	} ]
 });
 
+const Foo = new FakeModel('Foo', {
+	id: {
+		type: String,
+		required: true,
+		key: true
+	},
+	bars: [ {
+		bar: Number,
+		baz: { type: Number, protected: true }
+	} ]
+});
+
 const testAnimals = [
 	{
 		id: 'foo',
@@ -164,6 +176,17 @@ const permissionSets = {
 			readMask: true,
 			writeMask: true
 		}
+	}, {
+		target: 'Foo',
+		match: {},
+		grant: {
+			read: true,
+			query: true,
+			aggregate: true,
+			write: true,
+			readMask: true,
+			writeMask: true
+		}
 	} ]),
 	everything: new PermissionSet([ {
 		target: 'Animal',
@@ -174,6 +197,7 @@ const permissionSets = {
 
 module.exports = {
 	Animal,
+	Foo,
 	testAnimals,
 	permissionSets
 };

@@ -6,7 +6,7 @@ const { expect } = require('chai');
 const { ModelAccessWrapper } = require('../lib');
 const XError = require('xerror');
 const _ = require('lodash');
-const { Animal, testAnimals, permissionSets } = require('./lib/fake-data');
+const { Animal, Foo, testAnimals, permissionSets } = require('./lib/fake-data');
 
 
 describe('Wrapper', function() {
@@ -550,7 +550,27 @@ describe('Wrapper', function() {
 					id: 'asdf',
 					animalType: 'frog',
 					age: 5,
-					coolness: 4
+					coolness: 4,
+					favWords: []
+				});
+			});
+		});
+
+		it('ignore protected fields in arrays for new documents', function() {
+			let wrapper = new ModelAccessWrapper({ model: Foo });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					bars: [ { bar: 1 } ]
+				},
+				permissions: permissionSets.almostEverything
+			})
+			.then(() => Foo.findOne({ id: 'asdf' }))
+			.then((doc) => {
+				delete doc.data._id;
+				expect(doc.data).to.deep.equal({
+					id: 'asdf',
+					bars: [ { bar: 1 } ]
 				});
 			});
 		});
@@ -585,7 +605,8 @@ describe('Wrapper', function() {
 					id: 'asdf',
 					animalType: 'frog',
 					age: 6,
-					coolness: 4
+					coolness: 4,
+					favWords: []
 				});
 			});
 		});
