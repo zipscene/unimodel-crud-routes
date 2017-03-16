@@ -46,6 +46,10 @@ const Foo = new FakeModel('Foo', {
 	bars: [ {
 		bar: Number,
 		baz: { type: Number, protected: true }
+	} ],
+	beeps: [ {
+		bark: Number,
+		boop: { type: Number, protected: true }
 	} ]
 });
 
@@ -127,6 +131,25 @@ const permissionSets = {
 				favNumber: true
 			}
 		}
+	}, {
+		target: 'Foo',
+		match: {},
+		grant: {
+			read: true,
+			query: true,
+			aggregate: true,
+			write: true,
+			readMask: {
+				id: true,
+				bars: true,
+				'beeps.bark': true
+			},
+			writeMask: {
+				id: true,
+				bars: true,
+				'beeps.bark': true
+			}
+		}
 	} ]),
 	partialWriteOverProtected: new PermissionSet([ {
 		target: 'Animal',
@@ -145,6 +168,24 @@ const permissionSets = {
 				id: true,
 				animalType: true,
 				favNumber: true
+			}
+		}
+	}, {
+		target: 'Foo',
+		match: {},
+		grant: {
+			overwriteProtected: true,
+			read: true,
+			query: true,
+			aggregate: true,
+			write: true,
+			readMask: {
+				id: true,
+				bars: true
+			},
+			writeMask: {
+				id: true,
+				bars: true
 			}
 		}
 	} ]),
@@ -190,6 +231,10 @@ const permissionSets = {
 	} ]),
 	everything: new PermissionSet([ {
 		target: 'Animal',
+		match: {},
+		grant: true
+	}, {
+		target: 'Foo',
 		match: {},
 		grant: true
 	} ])

@@ -561,7 +561,7 @@ describe('Wrapper', function() {
 			return wrapper.put({
 				data: {
 					id: 'asdf',
-					bars: [ { bar: 1 } ]
+					bars: [ { bar: 1, baz: 2 } ]
 				},
 				permissions: permissionSets.almostEverything
 			})
@@ -607,6 +607,33 @@ describe('Wrapper', function() {
 					age: 6,
 					coolness: 4,
 					favWords: []
+				});
+			});
+		});
+
+		it('ignore protected fields in arrays for updates', function() {
+			let wrapper = new ModelAccessWrapper({ model: Foo });
+			return wrapper.put({
+				data: {
+					id: 'asdf'
+				},
+				permissions: permissionSets.almostEverything
+			})
+			.then(() => {
+				return wrapper.put({
+					data: {
+						id: 'asdf',
+						bars: [ { bar: 1, baz: 2 } ]
+					},
+					permissions: permissionSets.almostEverything
+				});
+			})
+			.then(() => Foo.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					bars: [ { bar: 1 } ]
 				});
 			});
 		});
@@ -678,6 +705,55 @@ describe('Wrapper', function() {
 			});
 		});
 
+		it('respect overwriteProtected with arrays for new documents', function() {
+			let wrapper = new ModelAccessWrapper({ model: Foo });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					bars: [ { bar: 1, baz: 2 } ]
+				},
+				permissions: permissionSets.everything,
+				overwriteProtected: true
+			})
+			.then(() => Foo.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				delete results[0].data._id;
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					bars: [ { bar: 1, baz: 2 } ]
+				});
+			});
+		});
+
+		it('respect overwriteProtected with arrays for updates', function() {
+			let wrapper = new ModelAccessWrapper({ model: Foo });
+			return wrapper.put({
+				data: {
+					id: 'asdf'
+				},
+				permissions: permissionSets.everything
+			})
+			.then(() => {
+				return wrapper.put({
+					data: {
+						id: 'asdf',
+						bars: [ { bar: 1, baz: 2 } ]
+					},
+					permissions: permissionSets.everything,
+					overwriteProtected: true
+				});
+			})
+			.then(() => Foo.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					bars: [ { bar: 1, baz: 2 } ]
+				});
+			});
+		});
+
 		it('respect overwriteProtected permissions', function() {
 			let wrapper = new ModelAccessWrapper({ model: Animal });
 			return wrapper.put({
@@ -708,6 +784,41 @@ describe('Wrapper', function() {
 					coolness: 3,
 					favNumber: 6,
 					favWords: [ 'foo', 'bar' ]
+				},
+				permissions: permissionSets.almostEverything,
+				overwriteProtected: true
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+				});
+		});
+
+		it('respect overwriteProtected permissions with arrays', function() {
+			let wrapper = new ModelAccessWrapper({ model: Foo });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					beeps: [ { bark: 1, boop: 2 } ]
+				},
+				permissions: permissionSets.partialWriteOverProtected,
+				overwriteProtected: true
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+					expect(err.data.grantKey).to.equal('writeMask.beeps');
+				});
+		});
+
+		it('error if no permission to overwriteProtected inside arrays', function() {
+			let wrapper = new ModelAccessWrapper({ model: Foo });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					beeps: [ { bark: 1, boop: 2 } ]
 				},
 				permissions: permissionSets.almostEverything,
 				overwriteProtected: true
