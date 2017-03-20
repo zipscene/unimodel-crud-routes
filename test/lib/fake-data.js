@@ -21,7 +21,36 @@ const Animal = new FakeModel('Animal', {
 	ssn: {
 		type: String,
 		private: true
-	}
+	},
+	coolness: {
+		type: Number,
+		protected: true,
+		default: 4
+	},
+	favNumber: {
+		type: Number,
+		protected: true
+	},
+	favWords: [ {
+		type: String,
+		protected: true
+	} ]
+});
+
+const Foo = new FakeModel('Foo', {
+	id: {
+		type: String,
+		required: true,
+		key: true
+	},
+	bars: [ {
+		bar: Number,
+		baz: { type: Number, protected: true }
+	} ],
+	beeps: [ {
+		bark: Number,
+		boop: { type: Number, protected: true }
+	} ]
 });
 
 const testAnimals = [
@@ -98,7 +127,65 @@ const permissionSets = {
 			},
 			writeMask: {
 				id: true,
+				animalType: true,
+				favNumber: true
+			}
+		}
+	}, {
+		target: 'Foo',
+		match: {},
+		grant: {
+			read: true,
+			query: true,
+			aggregate: true,
+			write: true,
+			readMask: {
+				id: true,
+				bars: true,
+				'beeps.bark': true
+			},
+			writeMask: {
+				id: true,
+				bars: true,
+				'beeps.bark': true
+			}
+		}
+	} ]),
+	partialWriteOverProtected: new PermissionSet([ {
+		target: 'Animal',
+		match: {},
+		grant: {
+			overwriteProtected: true,
+			read: true,
+			query: true,
+			aggregate: true,
+			write: true,
+			readMask: {
+				id: true,
 				animalType: true
+			},
+			writeMask: {
+				id: true,
+				animalType: true,
+				favNumber: true
+			}
+		}
+	}, {
+		target: 'Foo',
+		match: {},
+		grant: {
+			overwriteProtected: true,
+			read: true,
+			query: true,
+			aggregate: true,
+			write: true,
+			readMask: {
+				id: true,
+				bars: true
+			},
+			writeMask: {
+				id: true,
+				bars: true
 			}
 		}
 	} ]),
@@ -119,8 +206,35 @@ const permissionSets = {
 			}
 		}
 	]),
+	almostEverything: new PermissionSet([ {
+		target: 'Animal',
+		match: {},
+		grant: {
+			read: true,
+			query: true,
+			aggregate: true,
+			write: true,
+			readMask: true,
+			writeMask: true
+		}
+	}, {
+		target: 'Foo',
+		match: {},
+		grant: {
+			read: true,
+			query: true,
+			aggregate: true,
+			write: true,
+			readMask: true,
+			writeMask: true
+		}
+	} ]),
 	everything: new PermissionSet([ {
 		target: 'Animal',
+		match: {},
+		grant: true
+	}, {
+		target: 'Foo',
 		match: {},
 		grant: true
 	} ])
@@ -128,6 +242,7 @@ const permissionSets = {
 
 module.exports = {
 	Animal,
+	Foo,
 	testAnimals,
 	permissionSets
 };

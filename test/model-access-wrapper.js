@@ -6,7 +6,7 @@ const { expect } = require('chai');
 const { ModelAccessWrapper } = require('../lib');
 const XError = require('xerror');
 const _ = require('lodash');
-const { Animal, testAnimals, permissionSets } = require('./lib/fake-data');
+const { Animal, Foo, testAnimals, permissionSets } = require('./lib/fake-data');
 
 
 describe('Wrapper', function() {
@@ -32,7 +32,8 @@ describe('Wrapper', function() {
 						id: 'biz',
 						animalType: 'horse',
 						name: 'Lightning',
-						age: 3
+						age: 3,
+						coolness: 4
 					});
 				});
 		});
@@ -86,7 +87,8 @@ describe('Wrapper', function() {
 					animalType: 'horse',
 					name: 'Lightning',
 					age: 3,
-					ssn: '123-123-1234'
+					ssn: '123-123-1234',
+					coolness: 4
 				});
 			});
 		});
@@ -384,7 +386,8 @@ describe('Wrapper', function() {
 						id: 'asdf',
 						animalType: 'frog',
 						name: 'ASDF',
-						age: 99
+						age: 99,
+						coolness: 4
 					});
 				});
 		});
@@ -422,7 +425,8 @@ describe('Wrapper', function() {
 						id: 'asdf',
 						animalType: 'frog',
 						name: 'ASDF',
-						age: 99
+						age: 99,
+						coolness: 4
 					});
 				});
 		});
@@ -444,7 +448,8 @@ describe('Wrapper', function() {
 					delete results[0].data._id;
 					expect(results[0].data).to.deep.equal({
 						id: 'asdf',
-						animalType: 'frog'
+						animalType: 'frog',
+						coolness: 4
 					});
 				});
 		});
@@ -511,18 +516,318 @@ describe('Wrapper', function() {
 					permissions: permissionSets.everything
 				});
 			})
-			.then(() => {
-				return Animal.find({ id: 'asdf' });
-			})
+			.then(() => Animal.find({ id: 'asdf' }))
 			.then((results) => {
 				expect(results.length).to.equal(1);
 				expect(results[0].data).to.deep.equal({
 					id: 'asdf',
 					animalType: 'frog',
 					age: 6,
-					ssn: '456-456-4567'
+					ssn: '456-456-4567',
+					coolness: 4
 				});
 			});
+		});
+
+		it('ignore protected fields for new documents', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5,
+					coolness: 3,
+					favNumber: 6,
+					favWords: [ 'foo', 'bar' ]
+				},
+				permissions: permissionSets.almostEverything
+			})
+			.then(() => Animal.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				delete results[0].data._id;
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5,
+					coolness: 4,
+					favWords: []
+				});
+			});
+		});
+
+		it('ignore protected fields in arrays for new documents', function() {
+			let wrapper = new ModelAccessWrapper({ model: Foo });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					bars: [ { bar: 1, baz: 2 } ]
+				},
+				permissions: permissionSets.almostEverything
+			})
+			.then(() => Foo.findOne({ id: 'asdf' }))
+			.then((doc) => {
+				delete doc.data._id;
+				expect(doc.data).to.deep.equal({
+					id: 'asdf',
+					bars: [ { bar: 1 } ]
+				});
+			});
+		});
+
+		it('ignore protected fields for updates', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5
+				},
+				permissions: permissionSets.almostEverything
+			})
+			.then(() => {
+				return wrapper.put({
+					data: {
+						id: 'asdf',
+						animalType: 'frog',
+						age: 6,
+						coolness: 3,
+						favNumber: 2,
+						favWords: [ 'foo', 'bar' ]
+					},
+					permissions: permissionSets.almostEverything
+				});
+			})
+			.then(() => Animal.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					animalType: 'frog',
+					age: 6,
+					coolness: 4,
+					favWords: []
+				});
+			});
+		});
+
+		it('ignore protected fields in arrays for updates', function() {
+			let wrapper = new ModelAccessWrapper({ model: Foo });
+			return wrapper.put({
+				data: {
+					id: 'asdf'
+				},
+				permissions: permissionSets.almostEverything
+			})
+			.then(() => {
+				return wrapper.put({
+					data: {
+						id: 'asdf',
+						bars: [ { bar: 1, baz: 2 } ]
+					},
+					permissions: permissionSets.almostEverything
+				});
+			})
+			.then(() => Foo.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					bars: [ { bar: 1 } ]
+				});
+			});
+		});
+
+		it('respect overwriteProtected for new documents', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5,
+					coolness: 3,
+					favNumber: 6,
+					favWords: [ 'foo', 'bar' ]
+				},
+				permissions: permissionSets.everything,
+				overwriteProtected: true
+			})
+			.then(() => Animal.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				delete results[0].data._id;
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5,
+					coolness: 3,
+					favNumber: 6,
+					favWords: [ 'foo', 'bar' ]
+				});
+			});
+		});
+
+		it('respect overwriteProtected for updates', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5
+				},
+				permissions: permissionSets.everything
+			})
+			.then(() => {
+				return wrapper.put({
+					data: {
+						id: 'asdf',
+						animalType: 'frog',
+						age: 6,
+						coolness: 3,
+						favNumber: 2,
+						favWords: [ 'foo', 'bar' ]
+					},
+					permissions: permissionSets.everything,
+					overwriteProtected: true
+				});
+			})
+			.then(() => Animal.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					animalType: 'frog',
+					age: 6,
+					coolness: 3,
+					favNumber: 2,
+					favWords: [ 'foo', 'bar' ]
+				});
+			});
+		});
+
+		it('respect overwriteProtected with arrays for new documents', function() {
+			let wrapper = new ModelAccessWrapper({ model: Foo });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					bars: [ { bar: 1, baz: 2 } ]
+				},
+				permissions: permissionSets.everything,
+				overwriteProtected: true
+			})
+			.then(() => Foo.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				delete results[0].data._id;
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					bars: [ { bar: 1, baz: 2 } ]
+				});
+			});
+		});
+
+		it('respect overwriteProtected with arrays for updates', function() {
+			let wrapper = new ModelAccessWrapper({ model: Foo });
+			return wrapper.put({
+				data: {
+					id: 'asdf'
+				},
+				permissions: permissionSets.everything
+			})
+			.then(() => {
+				return wrapper.put({
+					data: {
+						id: 'asdf',
+						bars: [ { bar: 1, baz: 2 } ]
+					},
+					permissions: permissionSets.everything,
+					overwriteProtected: true
+				});
+			})
+			.then(() => Foo.find({ id: 'asdf' }))
+			.then((results) => {
+				expect(results.length).to.equal(1);
+				expect(results[0].data).to.deep.equal({
+					id: 'asdf',
+					bars: [ { bar: 1, baz: 2 } ]
+				});
+			});
+		});
+
+		it('respect overwriteProtected permissions', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					favNumber: 6,
+					favWords: [ 'foo', 'bar' ]
+				},
+				permissions: permissionSets.partialWriteOverProtected,
+				overwriteProtected: true
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+					expect(err.data.grantKey).to.equal('writeMask.coolness');
+				});
+		});
+
+		it('error if no permission to overwriteProtected', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					animalType: 'frog',
+					age: 5,
+					coolness: 3,
+					favNumber: 6,
+					favWords: [ 'foo', 'bar' ]
+				},
+				permissions: permissionSets.almostEverything,
+				overwriteProtected: true
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+				});
+		});
+
+		it('respect overwriteProtected permissions with arrays', function() {
+			let wrapper = new ModelAccessWrapper({ model: Foo });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					beeps: [ { bark: 1, boop: 2 } ]
+				},
+				permissions: permissionSets.partialWriteOverProtected,
+				overwriteProtected: true
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+					expect(err.data.grantKey).to.equal('writeMask.beeps');
+				});
+		});
+
+		it('error if no permission to overwriteProtected inside arrays', function() {
+			let wrapper = new ModelAccessWrapper({ model: Foo });
+			return wrapper.put({
+				data: {
+					id: 'asdf',
+					beeps: [ { bark: 1, boop: 2 } ]
+				},
+				permissions: permissionSets.almostEverything,
+				overwriteProtected: true
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+				});
 		});
 
 	});
@@ -561,7 +866,8 @@ describe('Wrapper', function() {
 						id: 'test',
 						animalType: 'dog',
 						name: 'Zag',
-						age: 10
+						age: 10,
+						coolness: 4
 					});
 				});
 		});
@@ -589,6 +895,64 @@ describe('Wrapper', function() {
 				query: { id: 'foo' },
 				update: { $set: { age: 50 } },
 				permissions: permissionSets.partialWrite
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+				});
+		});
+
+		it('error when update contains protected fields', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.upsert({
+				query: { id: 'baz' },
+				update: { $set: { animalType: 'dog', favNumber: 2 } },
+				permissions: permissionSets.partialWriteOverProtected
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.INVALID_ARGUMENT);
+				});
+		});
+
+		it('partial protected write permissions success', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.upsert({
+				query: { id: 'baz' },
+				update: { $set: { favNumber: 2 } },
+				permissions: permissionSets.partialWriteOverProtected,
+				overwriteProtected: true
+			})
+				.then(() => Animal.findOne({ id: 'baz' }))
+				.then((doc) => {
+					expect(doc.data.favNumber).to.equal(2);
+				});
+		});
+
+		it('partial protected write permissions failure', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.upsert({
+				query: { id: 'baz' },
+				update: { $set: { coolness: 2 } },
+				permissions: permissionSets.partialWriteOverProtected,
+				overwriteProtected: true
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+				});
+		});
+
+		it('error if no permission to overwriteProtected', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.upsert({
+				query: { id: 'baz' },
+				update: { $set: { animalType: 'dog', favNumber: 2 } },
+				permissions: permissionSets.partialWrite,
+				overwriteProtected: true
 			})
 				.then(() => {
 					throw new Error('Expected error');
@@ -666,9 +1030,7 @@ describe('Wrapper', function() {
 	describe('update()', function() {
 
 		it('basic functionality', function() {
-			let wrapper = new ModelAccessWrapper({
-				model: Animal
-			});
+			let wrapper = new ModelAccessWrapper({ model: Animal });
 			return wrapper.update({
 				query: { name: 'Felix' },
 				update: { $set: { age: 10 } },
@@ -681,9 +1043,7 @@ describe('Wrapper', function() {
 		});
 
 		it('partial write permissions success', function() {
-			let wrapper = new ModelAccessWrapper({
-				model: Animal
-			});
+			let wrapper = new ModelAccessWrapper({ model: Animal });
 			return wrapper.update({
 				query: { id: 'baz' },
 				update: { $set: { animalType: 'dog' } },
@@ -696,13 +1056,69 @@ describe('Wrapper', function() {
 		});
 
 		it('partial write permissions failure', function() {
-			let wrapper = new ModelAccessWrapper({
-				model: Animal
-			});
+			let wrapper = new ModelAccessWrapper({ model: Animal });
 			return wrapper.update({
 				query: { id: 'baz' },
 				update: { $set: { age: 1 } },
 				permissions: permissionSets.partialWrite
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+				});
+		});
+
+		it('error when update contains protected fields', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.update({
+				query: { id: 'baz' },
+				update: { $set: { animalType: 'dog', favNumber: 2 } },
+				permissions: permissionSets.partialWriteOverProtected
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.INVALID_ARGUMENT);
+				});
+		});
+
+		it('partial protected write permissions success', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.update({
+				query: { id: 'baz' },
+				update: { $set: { favNumber: 2 } },
+				permissions: permissionSets.partialWriteOverProtected,
+				overwriteProtected: true
+			})
+				.then(() => Animal.findOne({ id: 'baz' }))
+				.then((doc) => {
+					expect(doc.data.favNumber).to.equal(2);
+				});
+		});
+
+		it('partial protected write permissions failure', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.update({
+				query: { id: 'baz' },
+				update: { $set: { coolness: 2 } },
+				permissions: permissionSets.partialWriteOverProtected,
+				overwriteProtected: true
+			})
+				.then(() => {
+					throw new Error('Expected error');
+				}, (err) => {
+					expect(err.code).to.equal(XError.ACCESS_DENIED);
+				});
+		});
+
+		it('error if no permission to overwriteProtected', function() {
+			let wrapper = new ModelAccessWrapper({ model: Animal });
+			return wrapper.update({
+				query: { id: 'baz' },
+				update: { $set: { animalType: 'dog', favNumber: 2 } },
+				permissions: permissionSets.partialWrite,
+				overwriteProtected: true
 			})
 				.then(() => {
 					throw new Error('Expected error');

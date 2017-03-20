@@ -417,7 +417,8 @@ describe('Routes', function() {
 					expect(result.data).to.deep.equal({
 						id: 'asdf',
 						animalType: 'cat',
-						age: 444
+						age: 444,
+						coolness: 4
 					});
 				});
 		});
