@@ -1,6 +1,6 @@
 {
   "name": "unimodel-crud-routes",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "CRUD route code for interfacing with unimodel",
   "main": "./dist/lib/index.js",
   "repository": {
