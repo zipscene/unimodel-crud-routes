@@ -506,27 +506,27 @@ describe('Wrapper', function() {
 				permissions: permissionSets.everything,
 				allowPrivateFields: true
 			})
-			.then(() => {
-				return wrapper.put({
-					data: {
+				.then(() => {
+					return wrapper.put({
+						data: {
+							id: 'asdf',
+							animalType: 'frog',
+							age: 6
+						},
+						permissions: permissionSets.everything
+					});
+				})
+				.then(() => Animal.find({ id: 'asdf' }))
+				.then((results) => {
+					expect(results.length).to.equal(1);
+					expect(results[0].data).to.deep.equal({
 						id: 'asdf',
 						animalType: 'frog',
-						age: 6
-					},
-					permissions: permissionSets.everything
+						age: 6,
+						ssn: '456-456-4567',
+						coolness: 4
+					});
 				});
-			})
-			.then(() => Animal.find({ id: 'asdf' }))
-			.then((results) => {
-				expect(results.length).to.equal(1);
-				expect(results[0].data).to.deep.equal({
-					id: 'asdf',
-					animalType: 'frog',
-					age: 6,
-					ssn: '456-456-4567',
-					coolness: 4
-				});
-			});
 		});
 
 		it('ignore protected fields for new documents', function() {
@@ -542,18 +542,18 @@ describe('Wrapper', function() {
 				},
 				permissions: permissionSets.almostEverything
 			})
-			.then(() => Animal.find({ id: 'asdf' }))
-			.then((results) => {
-				expect(results.length).to.equal(1);
-				delete results[0].data._id;
-				expect(results[0].data).to.deep.equal({
-					id: 'asdf',
-					animalType: 'frog',
-					age: 5,
-					coolness: 4,
-					favWords: []
+				.then(() => Animal.find({ id: 'asdf' }))
+				.then((results) => {
+					expect(results.length).to.equal(1);
+					delete results[0].data._id;
+					expect(results[0].data).to.deep.equal({
+						id: 'asdf',
+						animalType: 'frog',
+						age: 5,
+						coolness: 4,
+						favWords: []
+					});
 				});
-			});
 		});
 
 		it('ignore protected fields in arrays for new documents', function() {
@@ -565,14 +565,14 @@ describe('Wrapper', function() {
 				},
 				permissions: permissionSets.almostEverything
 			})
-			.then(() => Foo.findOne({ id: 'asdf' }))
-			.then((doc) => {
-				delete doc.data._id;
-				expect(doc.data).to.deep.equal({
-					id: 'asdf',
-					bars: [ { bar: 1 } ]
+				.then(() => Foo.findOne({ id: 'asdf' }))
+				.then((doc) => {
+					delete doc.data._id;
+					expect(doc.data).to.deep.equal({
+						id: 'asdf',
+						bars: [ { bar: 1 } ]
+					});
 				});
-			});
 		});
 
 		it('ignore protected fields for updates', function() {
@@ -585,30 +585,30 @@ describe('Wrapper', function() {
 				},
 				permissions: permissionSets.almostEverything
 			})
-			.then(() => {
-				return wrapper.put({
-					data: {
+				.then(() => {
+					return wrapper.put({
+						data: {
+							id: 'asdf',
+							animalType: 'frog',
+							age: 6,
+							coolness: 3,
+							favNumber: 2,
+							favWords: [ 'foo', 'bar' ]
+						},
+						permissions: permissionSets.almostEverything
+					});
+				})
+				.then(() => Animal.find({ id: 'asdf' }))
+				.then((results) => {
+					expect(results.length).to.equal(1);
+					expect(results[0].data).to.deep.equal({
 						id: 'asdf',
 						animalType: 'frog',
 						age: 6,
-						coolness: 3,
-						favNumber: 2,
-						favWords: [ 'foo', 'bar' ]
-					},
-					permissions: permissionSets.almostEverything
+						coolness: 4,
+						favWords: []
+					});
 				});
-			})
-			.then(() => Animal.find({ id: 'asdf' }))
-			.then((results) => {
-				expect(results.length).to.equal(1);
-				expect(results[0].data).to.deep.equal({
-					id: 'asdf',
-					animalType: 'frog',
-					age: 6,
-					coolness: 4,
-					favWords: []
-				});
-			});
 		});
 
 		it('ignore protected fields in arrays for updates', function() {
@@ -619,23 +619,23 @@ describe('Wrapper', function() {
 				},
 				permissions: permissionSets.almostEverything
 			})
-			.then(() => {
-				return wrapper.put({
-					data: {
+				.then(() => {
+					return wrapper.put({
+						data: {
+							id: 'asdf',
+							bars: [ { bar: 1, baz: 2 } ]
+						},
+						permissions: permissionSets.almostEverything
+					});
+				})
+				.then(() => Foo.find({ id: 'asdf' }))
+				.then((results) => {
+					expect(results.length).to.equal(1);
+					expect(results[0].data).to.deep.equal({
 						id: 'asdf',
-						bars: [ { bar: 1, baz: 2 } ]
-					},
-					permissions: permissionSets.almostEverything
+						bars: [ { bar: 1 } ]
+					});
 				});
-			})
-			.then(() => Foo.find({ id: 'asdf' }))
-			.then((results) => {
-				expect(results.length).to.equal(1);
-				expect(results[0].data).to.deep.equal({
-					id: 'asdf',
-					bars: [ { bar: 1 } ]
-				});
-			});
 		});
 
 		it('respect overwriteProtected for new documents', function() {
@@ -652,19 +652,19 @@ describe('Wrapper', function() {
 				permissions: permissionSets.everything,
 				overwriteProtected: true
 			})
-			.then(() => Animal.find({ id: 'asdf' }))
-			.then((results) => {
-				expect(results.length).to.equal(1);
-				delete results[0].data._id;
-				expect(results[0].data).to.deep.equal({
-					id: 'asdf',
-					animalType: 'frog',
-					age: 5,
-					coolness: 3,
-					favNumber: 6,
-					favWords: [ 'foo', 'bar' ]
+				.then(() => Animal.find({ id: 'asdf' }))
+				.then((results) => {
+					expect(results.length).to.equal(1);
+					delete results[0].data._id;
+					expect(results[0].data).to.deep.equal({
+						id: 'asdf',
+						animalType: 'frog',
+						age: 5,
+						coolness: 3,
+						favNumber: 6,
+						favWords: [ 'foo', 'bar' ]
+					});
 				});
-			});
 		});
 
 		it('respect overwriteProtected for updates', function() {
@@ -677,32 +677,32 @@ describe('Wrapper', function() {
 				},
 				permissions: permissionSets.everything
 			})
-			.then(() => {
-				return wrapper.put({
-					data: {
+				.then(() => {
+					return wrapper.put({
+						data: {
+							id: 'asdf',
+							animalType: 'frog',
+							age: 6,
+							coolness: 3,
+							favNumber: 2,
+							favWords: [ 'foo', 'bar' ]
+						},
+						permissions: permissionSets.everything,
+						overwriteProtected: true
+					});
+				})
+				.then(() => Animal.find({ id: 'asdf' }))
+				.then((results) => {
+					expect(results.length).to.equal(1);
+					expect(results[0].data).to.deep.equal({
 						id: 'asdf',
 						animalType: 'frog',
 						age: 6,
 						coolness: 3,
 						favNumber: 2,
 						favWords: [ 'foo', 'bar' ]
-					},
-					permissions: permissionSets.everything,
-					overwriteProtected: true
+					});
 				});
-			})
-			.then(() => Animal.find({ id: 'asdf' }))
-			.then((results) => {
-				expect(results.length).to.equal(1);
-				expect(results[0].data).to.deep.equal({
-					id: 'asdf',
-					animalType: 'frog',
-					age: 6,
-					coolness: 3,
-					favNumber: 2,
-					favWords: [ 'foo', 'bar' ]
-				});
-			});
 		});
 
 		it('respect overwriteProtected with arrays for new documents', function() {
@@ -715,15 +715,15 @@ describe('Wrapper', function() {
 				permissions: permissionSets.everything,
 				overwriteProtected: true
 			})
-			.then(() => Foo.find({ id: 'asdf' }))
-			.then((results) => {
-				expect(results.length).to.equal(1);
-				delete results[0].data._id;
-				expect(results[0].data).to.deep.equal({
-					id: 'asdf',
-					bars: [ { bar: 1, baz: 2 } ]
+				.then(() => Foo.find({ id: 'asdf' }))
+				.then((results) => {
+					expect(results.length).to.equal(1);
+					delete results[0].data._id;
+					expect(results[0].data).to.deep.equal({
+						id: 'asdf',
+						bars: [ { bar: 1, baz: 2 } ]
+					});
 				});
-			});
 		});
 
 		it('respect overwriteProtected with arrays for updates', function() {
@@ -734,24 +734,24 @@ describe('Wrapper', function() {
 				},
 				permissions: permissionSets.everything
 			})
-			.then(() => {
-				return wrapper.put({
-					data: {
+				.then(() => {
+					return wrapper.put({
+						data: {
+							id: 'asdf',
+							bars: [ { bar: 1, baz: 2 } ]
+						},
+						permissions: permissionSets.everything,
+						overwriteProtected: true
+					});
+				})
+				.then(() => Foo.find({ id: 'asdf' }))
+				.then((results) => {
+					expect(results.length).to.equal(1);
+					expect(results[0].data).to.deep.equal({
 						id: 'asdf',
 						bars: [ { bar: 1, baz: 2 } ]
-					},
-					permissions: permissionSets.everything,
-					overwriteProtected: true
+					});
 				});
-			})
-			.then(() => Foo.find({ id: 'asdf' }))
-			.then((results) => {
-				expect(results.length).to.equal(1);
-				expect(results[0].data).to.deep.equal({
-					id: 'asdf',
-					bars: [ { bar: 1, baz: 2 } ]
-				});
-			});
 		});
 
 		it('respect overwriteProtected permissions', function() {

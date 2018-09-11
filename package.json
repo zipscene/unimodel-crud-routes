@@ -1,8 +1,8 @@
 {
   "name": "unimodel-crud-routes",
-  "version": "0.1.14",
+  "version": "1.0.0",
   "description": "CRUD route code for interfacing with unimodel",
-  "main": "./dist/lib/index.js",
+  "main": "./lib/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/zipscene/unimodel-crud-routes.git"
@@ -14,43 +14,36 @@
   "scripts": {
     "lint": "node ./node_modules/.bin/eslint . || exit 0",
     "docs": "node ./node_modules/.bin/yuidoc .",
-    "test": "npm run-script build && node ./node_modules/.bin/mocha ./dist/test -R spec",
-    "build": "rm -rf dist && ./node_modules/.bin/broccoli build dist && rm -rf tmp",
-    "prepublish": "npm run-script build && npm run-script docs"
+    "test": "node ./node_modules/.bin/mocha ./test -R spec",
+    "prepublishOnly": "npm run-script docs"
   },
   "dependencies": {
-    "babel-runtime": "6.3.19",
+    "common-query": "^2.0.1",
+    "common-schema": "^2.0.1",
     "crisphooks": "^2.0.0",
-    "decamelize": "^1.1.2",
-    "lodash": "^4.2.1",
-    "pasync": "^1.4.0",
-    "xerror": "^1.1.1",
-    "zstreams": "^3.2.2",
-    "yaar": "^1.4.6",
-    "common-query": "^1.9.4",
-    "common-schema": "^1.7.7",
-    "unimodel-schema-types": "^0.2.5",
-    "objtools": "^1.4.0",
-    "flexperm": "^1.0.2",
-    "simprof": "^1.2.5",
-    "unimodel-core": "^0.6.4"
+    "decamelize": "^2.0.0",
+    "flexperm": "^2.0.2",
+    "lodash": "^4.17.10",
+    "objtools": "^2.0.1",
+    "pasync": "^1.5.0",
+    "simprof": "^2.0.0",
+    "unimodel-core": "^1.0.0",
+    "unimodel-schema-types": "^1.0.0",
+    "xerror": "^1.1.2",
+    "yaar": "^2.0.0",
+    "zstreams": "^4.0.0"
   },
   "devDependencies": {
-    "broccoli": "^0.16.9",
-    "broccoli-babel-transpiler": "^5.5.0",
-    "broccoli-cli": "^1.0.0",
-    "broccoli-merge-trees": "^1.1.1",
-    "broccoli-static-compiler": "^0.2.2",
-    "broccoli-wrap": "0.0.2",
-    "chai": "^3.5.0",
-    "es6-promise": "^3.0.2",
-    "eslint": "^1.10.3",
-    "express": "^4.13.4",
-    "mocha": "^2.4.5",
-    "source-map-support": "^0.4.0",
-    "supertest": "^1.1.0",
-    "yuidocjs": "^0.10.0",
-    "unimodel-fake": "^0.2.1"
+    "chai": "^4.1.2",
+    "eslint": "^5.5.0",
+    "express": "^4.16.3",
+    "mocha": "^5.2.0",
+    "supertest": "^3.3.0",
+    "unimodel-fake": "^1.0.0",
+    "yuidocjs": "^0.10.2"
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 8.0.0"
+  }
 }
