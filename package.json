@@ -1,6 +1,6 @@
 {
   "name": "unimodel-crud-routes",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "CRUD route code for interfacing with unimodel",
   "main": "./lib/index.js",
   "repository": {
@@ -26,9 +26,9 @@
     "pasync": "^2.0.2",
     "simprof": "^3.0.0",
     "unimodel-core": "^2.0.0",
-    "unimodel-schema-types": "^2.0.0",
+    "unimodel-schema-types": "^2.0.1",
     "xerror": "^2.0.0",
-    "yaar": "^3.0.0",
+    "yaar": "^3.0.2",
     "zstreams": "^5.0.0"
   },
   "devDependencies": {
