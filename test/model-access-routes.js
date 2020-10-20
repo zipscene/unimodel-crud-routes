@@ -220,10 +220,11 @@ describe('Routes', function() {
 				fields: [ 'id', 'name' ]
 			})
 				.then((result) => {
-					let expected = '{"data":{"id":"foo","name":"Toby"}}\n' +
-						'{"data":{"id":"bar","name":"Ruff"}}\n' +
-						'{"success":false,"error":{"code":"internal_error","message":"Test error"}}\n';
-					expect(result).to.equal(expected);
+					let expectedArr = result.split('\n');
+					let expected = JSON.parse(expectedArr[2]);
+					expect(expected.success).to.equal(false);
+					expect(expected.error.code).to.equal('internal_error');
+					expect(expected.error.message).to.equal('Test error');
 				});
 		});
 
